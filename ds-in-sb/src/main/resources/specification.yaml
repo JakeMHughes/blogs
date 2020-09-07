@@ -1,0 +1,149 @@
+openapi: 3.0.0
+info:
+  title: specification
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080/api
+    description: Local Development url
+paths:
+  '/sys/billionaires':
+    get:
+      description: Get all billionaires
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/billionairesTypeArr'
+        '400':
+          description: when request is invalid or incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorType'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorType'
+components:
+  schemas:
+    billionairesType:
+      example:
+        id: 1
+        name: Bill Gates
+        career: He is CEO of Microsoft
+      type: object
+      required:
+        - id
+        - career
+      additionalProperties: true
+      properties:
+        id:
+          type: number
+        career:
+          type: string
+        name:
+          type: string
+    billionairesTypeArr:
+      example:
+        - id: 1
+          name: Bill Gates
+          career: He is CEO of Microsoft
+      type: array
+      items:
+        $ref: '#/components/schemas/billionairesType'
+    errorType:
+      description: This dataType is use for error message
+      x-amf-examples:
+        example_0:
+          message: bad request
+        example_1:
+          message: server error
+        example_2:
+          message: bad request
+        example_3:
+          message: conflict
+        example_4:
+          message: server error
+        example_5:
+          message: bad request
+        example_6:
+          message: employee was not found
+        example_7:
+          message: server error
+        example_8:
+          message: bad request
+        example_9:
+          message: employee was not found
+        example_10:
+          message: server error
+        example_11:
+          message: ' employee was not found'
+        example_12:
+          message: server error
+        example_13:
+          message: bad request
+        example_14:
+          message: bad request
+        example_15:
+          message: server error
+        example_16:
+          message: bad request
+        example_17:
+          message: conflict
+        example_18:
+          message: server error
+        example_19:
+          message: bad request
+        example_20:
+          message: certification was not found
+        example_21:
+          message: server error
+        example_22:
+          message: bad request
+        example_23:
+          message: certification was not found
+        example_24:
+          message: server error
+        example_25:
+          message: ' certification was not found'
+        example_26:
+          message: server error
+        example_27:
+          message: bad request
+        example_28:
+          message: bad request
+        example_29:
+          message: server error
+        example_30:
+          message: bad request
+        example_31:
+          message: conflict
+        example_32:
+          message: server error
+        example_33:
+          message: bad request
+        example_34:
+          message: skill was not found
+        example_35:
+          message: server error
+        example_36:
+          message: bad request
+        example_37:
+          message: skill was not found
+        example_38:
+          message: server error
+        example_39:
+          message: ' skill was not found'
+        example_40:
+          message: server error
+        example_41:
+          message: bad request
+      type: object
+      additionalProperties: true
+      properties:
+        message:
+          type: string
