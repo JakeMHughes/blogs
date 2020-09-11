@@ -16,9 +16,16 @@
 
 	<properties>
 		<java.version>11</java.version>
+		<!--<datasonnet.version>1.0.4</datasonnet.version>-->
+		<datasonnet.version>0.3.1-MS3-TEST-SNAPSHOT</datasonnet.version>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.datasonnet</groupId>
+			<artifactId>datasonnet-mapper</artifactId>
+			<version>${datasonnet.version}</version>
+		</dependency>
 		<!-- Dependency for validation using HttpServlet -->
 		<dependency>
 			<groupId>org.openapi4j</groupId>
@@ -54,6 +61,17 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<!-- Exclude the Tomcat dependency -->
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-undertow</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

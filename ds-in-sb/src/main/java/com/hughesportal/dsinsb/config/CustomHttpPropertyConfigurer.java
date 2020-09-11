@@ -8,14 +8,8 @@ import org.springframework.context.annotation.Configuration;
 public class CustomHttpPropertyConfigurer {
 
     @Bean
-    @ConfigurationProperties("downstream.api.one")
-    public HttpRequestProperties httpRequestApiOne(){
-        return new HttpRequestProperties();
-    }
-
-    @Bean
-    @ConfigurationProperties("downstream.api.two")
-    public HttpRequestProperties httpRequestApiTwo(){
+    @ConfigurationProperties("downstream.system")
+    public HttpRequestProperties httpRequestSystem(){
         return new HttpRequestProperties();
     }
 

@@ -1,0 +1,6 @@
+std.map(function(it)
+{
+    id:it.id,
+    name:it.first_name + ' ' + it.last_name,
+    career: it.career
+}, payload)
