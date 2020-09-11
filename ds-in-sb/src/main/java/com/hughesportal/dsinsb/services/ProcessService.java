@@ -36,16 +36,13 @@ public class ProcessService {
     public ResponseEntity<?> getAllBillionaires(){
         String response = httpRequestSystem.apiCall_get(webClient,log,"/billionaires").getBody();
 
-        String[] pathnames;
-        File f = new File("/");
-        pathnames = f.list();
-        for (String pathname : pathnames) {
-            System.out.println(pathname);
-        }
-
-
         String transformed = Utilities.datasonnetMappingString(
-                "import '../../../../resources/getBillionaires_payloadMapping.ds'",
+                "std.map(function(it)\n" +
+                        "{\n" +
+                        "    id:it.id,\n" +
+                        "    name:it.first_name + ' ' + it.last_name,\n" +
+                        "    career: it.career\n" +
+                        "}, payload)",
                 response);
         return ResponseEntity.status(200).body(transformed);
     }
