@@ -1,7 +1,7 @@
 package com.hughesportal.dsinsb.services;
 
-import com.datasonnet.document.DefaultDocument;
-import com.datasonnet.document.MediaType;
+import com.datasonnet.Mapper;
+import com.datasonnet.document.StringDocument;
 import com.hughesportal.dsinsb.Utilities;
 import com.hughesportal.dsinsb.repositories.BillionairesRepository;
 import org.slf4j.Logger;
@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-
+import java.util.Set;
 
 @Service
 public class SystemService {
@@ -21,6 +21,22 @@ public class SystemService {
     @Autowired
     BillionairesRepository repo;
 
+    private final Map<String, Mapper> mappers = Map.of(
+            "getFirstName", Utilities.getMapper("payload.first_name"),
+            "getLastName", Utilities.getMapper("payload.last_name"),
+            "getCareer", Utilities.getMapper("payload.career"),
+            "updateInputMap", Utilities.getMapper("local getOrDefault(item)=" +
+                    "    if(item in payload) then" +
+                    "        payload[item]" +
+                    "    else" +
+                    "        current[item];" +
+                    "{" +
+                    "    first_name: getOrDefault(\"first_name\")," +
+                    "    last_name: getOrDefault(\"last_name\")," +
+                    "    career: getOrDefault(\"career\")" +
+                    "}", Set.of("current"))
+    );
+
     public ResponseEntity<?> getAllBillionaires(){
         String values = repo.getAllBillionaires();
         log.info(values);
@@ -28,9 +44,9 @@ public class SystemService {
     }
 
     public ResponseEntity<?> createNewBillionaire(String payload, String locationData){
-        String firstName = Utilities.datasonnetMappingString("payload.first_name",payload).replaceAll("\"","");
-        String lastName = Utilities.datasonnetMappingString("payload.last_name",payload).replaceAll("\"","");
-        String career = Utilities.datasonnetMappingString("payload.career",payload).replaceAll("\"","");
+        String firstName = mappers.get("getFirstName").transform(payload).replaceAll("\"","");
+        String lastName = mappers.get("getLastName").transform(payload).replaceAll("\"","");
+        String career = mappers.get("getCareer").transform(payload).replaceAll("\"","");
 
         if(repo.insertBillionaire(firstName,lastName,career) > 0){
             return ResponseEntity.status(201).header("Location", locationData+"/"+ repo.getLastInsert()).body(null);
@@ -40,35 +56,27 @@ public class SystemService {
 
     public ResponseEntity<?> getBillionaireByID(int id){
         String billionaire = repo.getBillionaireByID(id);
-        if(!billionaire.contains("id")){
-            return ResponseEntity.status(404).body("{\"message\":\"Failed to get the billionaire.\"}");
+        if(billionaire == null || !billionaire.contains("id")){
+            return ResponseEntity.status(404).body("{\"message\":\"Billionaire does not exist.\"}");
         }
-        return ResponseEntity.status(200).body(billionaire);
+        return ResponseEntity.status(200).header("Content-Type", "application/json").body(billionaire);
     }
 
     public ResponseEntity<?> updateBillionaireByID(int id, String payload){
 
         String currentBillionaire = repo.getBillionaireByID(id);
-        if(!currentBillionaire.contains("id")){
-            return ResponseEntity.status(404).body("{\"message\":\"Failed to get the billionaire.\"}");
+        if(currentBillionaire == null || !currentBillionaire.contains("id")){
+            return ResponseEntity.status(404).body("{\"message\":\"Billionaire does not exist.\"}");
         }
 
-        String newPayload = Utilities.datasonnetMappingString(
-                "local getOrDefault(item)=" +
-                        "    if(item in payload) then" +
-                        "        payload[item]" +
-                        "    else" +
-                        "        current[item];" +
-                        "{" +
-                        "    first_name: getOrDefault(\"first_name\")," +
-                        "    last_name: getOrDefault(\"last_name\")," +
-                        "    career: getOrDefault(\"career\")" +
-                        "}",
-                payload, Map.of("current", new DefaultDocument(currentBillionaire, MediaType.parseMediaType("application/json"))));
+        String newPayload = mappers.get("updateInputMap").transform(
+                new StringDocument(payload, "application/json"),
+                Map.of("current", new StringDocument(currentBillionaire, "application/json"))
+        ).getContentsAsString();
 
-        String firstName = Utilities.datasonnetMappingString("payload.first_name",newPayload).replaceAll("\"","");
-        String lastName = Utilities.datasonnetMappingString("payload.last_name",newPayload).replaceAll("\"","");
-        String career = Utilities.datasonnetMappingString("payload.career",newPayload).replaceAll("\"","");
+        String firstName = mappers.get("getFirstName").transform(newPayload).replaceAll("\"","");
+        String lastName = mappers.get("getLastName").transform(newPayload).replaceAll("\"","");
+        String career = mappers.get("getCareer").transform(newPayload).replaceAll("\"","");
 
         if(repo.updateBillionaireByID(id,firstName,lastName,career)>0){
             return ResponseEntity.status(204).body(null);
@@ -80,6 +88,6 @@ public class SystemService {
         if(repo.deleteBillionaireByID(id)>0){
             return ResponseEntity.status(204).body(null);
         }
-        return ResponseEntity.status(500).body("{\"message\":\"Failed to remove the billionaire.\"}");
+        return ResponseEntity.status(404).body("{\"message\":\"Billionaire does not exist.\"}");
     }
 }

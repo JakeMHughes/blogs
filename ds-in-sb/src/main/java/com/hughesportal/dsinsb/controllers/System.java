@@ -29,7 +29,7 @@ public class System {
         return service.getAllBillionaires();
     }
 
-    @RequestMapping(value = "/billionaires", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)//, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/billionaires", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createNewBillionaire(HttpServletRequest servlet) throws IOException {
         return service.createNewBillionaire(servlet.getReader().lines().collect(Collectors.joining()), servlet.getRequestURL().toString());
     }
@@ -39,12 +39,12 @@ public class System {
         return service.getBillionaireByID(id);
     }
 
-    @RequestMapping(value = "/billionaires/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/billionaires/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateBillionaire(@PathVariable("id") Integer id, HttpServletRequest servlet) throws IOException {
         return service.updateBillionaireByID(id, servlet.getReader().lines().collect(Collectors.joining()));
     }
 
-    @RequestMapping(value = "/billionaires/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/billionaires/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteBillionaire(@PathVariable("id") Integer id){
         return service.deleteBillionaireByID(id);
     }
